@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Container } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { useMutation, gql } from '@apollo/client'
+import { useHistory } from 'react-router-dom';
+import useToken from '../utils/useToken';
 
-const Login = ({ setToken }) => {
+const Login = () => {
+    let history = useHistory()
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const { token, setToken } = useToken();
 
     const [tokenAuth, { data, loading, error }] = useMutation(
         gql`
@@ -17,9 +21,9 @@ const Login = ({ setToken }) => {
         `
     );
 
-    useEffect(() => {
-        data?.tokenAuth && setToken(data.tokenAuth.token)
-    }, [data])
+    if (data?.tokenAuth) {
+        setToken(data.tokenAuth)
+    }
 
     return(
         <div className='d-flex' style={{height: '80vh'}} >
@@ -40,6 +44,7 @@ const Login = ({ setToken }) => {
                         e.preventDefault();
                         console.log(username, password);
                         tokenAuth({ variables: { username, password } });
+                        history.push('/dashboard');
                     }} block variant="dark" type="submit">
                         Login
                     </Button>

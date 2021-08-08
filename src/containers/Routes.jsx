@@ -1,26 +1,25 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
 import CoffeeDashboard from '../components/CoffeeDashboard';
 import Navagation from '../components/Navbar';
 import UserPreferences from '../components/UserPreferences';
 import Login from '../components/Login';
+import useToken from '../utils/useToken';
 
 const Routes = () => {
-    const [token, setToken] = useState();
+    let history = useHistory();
+    const { token } = useToken();
+    console.log('Routes', token);
 
     if (!token) {
-        return (
-            <>
-                <Redirect to='/login' />
-                <Login setToken={setToken} />
-            </>
-        )
+        history.push('/login');
     }
 
     return(
         <>
             <Navagation />
             <Switch>
+                <Route exact path="/" render={() => (<Redirect to="/dashboard" />)} />  
                 <Route path='/dashboard'>
                     <CoffeeDashboard />
                 </Route>
@@ -28,7 +27,7 @@ const Routes = () => {
                     <UserPreferences />
                 </Route>
                 <Route path='/login'>
-                    <Login setToken={setToken} />
+                    <Login />
                 </Route>
             </Switch>
         </>
