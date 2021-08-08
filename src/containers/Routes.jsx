@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import CoffeeDashboard from '../components/CoffeeDashboard';
 import Navagation from '../components/Navbar';
 import UserPreferences from '../components/UserPreferences';
@@ -8,11 +8,18 @@ import Login from '../components/Login';
 const Routes = () => {
     const [token, setToken] = useState();
 
-    !token && <Login setToken={setToken} />
+    if (!token) {
+        return (
+            <>
+                <Redirect to='/login' />
+                <Login setToken={setToken} />
+            </>
+        )
+    }
 
     return(
-        <BrowserRouter>
-        <Navagation />
+        <>
+            <Navagation />
             <Switch>
                 <Route path='/dashboard'>
                     <CoffeeDashboard />
@@ -20,8 +27,11 @@ const Routes = () => {
                 <Route path='/preferences'>
                     <UserPreferences />
                 </Route>
+                <Route path='/login'>
+                    <Login setToken={setToken} />
+                </Route>
             </Switch>
-        </BrowserRouter>
+        </>
     )
 }
 
