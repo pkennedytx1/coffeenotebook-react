@@ -1,19 +1,12 @@
-import React, { useEffect } from 'react';
-import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import CoffeeDashboard from '../components/CoffeeDashboard';
 import Navagation from '../components/Navbar';
 import UserPreferences from '../components/UserPreferences';
 import Login from '../components/Login';
-import useToken from '../utils/useToken';
+import { AuthContext } from '../stores/authStore';
 
 const Routes = () => {
-    let history = useHistory();
-    const { token } = useToken();
-    console.log('Routes', token);
-
-    if (!token) {
-        history.push('/login');
-    }
 
     return(
         <>

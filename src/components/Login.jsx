@@ -1,30 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import PropTypes from 'prop-types';
-import { useMutation, gql } from '@apollo/client'
-import { useHistory } from 'react-router-dom';
-import useToken from '../utils/useToken';
+import { useMutation } from '@apollo/client'
+import { TOKEN_AUTH } from '../graphql/mutations/authMutations';
+import { AuthContext } from '../stores/authStore';
 
 const Login = () => {
-    let history = useHistory()
+    const { authState, dispatchAuthState } = useContext(AuthContext);
+
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { token, setToken } = useToken();
+    const [tokenAuth, { data, loading, error }] = useMutation(TOKEN_AUTH);
 
-    const [tokenAuth, { data, loading, error }] = useMutation(
-        gql`
-            mutation TokenAuth($username: String!, $password: String!) {
-                tokenAuth(username: $username, password: $password) {
-                    token
-                }
-            }
-        `
-    );
-
-    if (data?.tokenAuth) {
-        setToken(data.tokenAuth)
-    }
-
+    loading && <h1>Loading Data...</h1>;
+    error && console.error(error);
+    data?.tokenAuth && dispatchAuthState({ type: 'SET_TOKEN', payload: data.tokenAuth.token });
+    
     return(
         <div className='d-flex' style={{height: '80vh'}} >
             <Form className='align-self-center' style={{width: '300px', margin: '0 auto'}} >
@@ -42,9 +32,7 @@ const Login = () => {
                 <div className="d-grid gap-2">
                     <Button onClick={(e) => {
                         e.preventDefault();
-                        console.log(username, password);
-                        tokenAuth({ variables: { username, password } });
-                        history.push('/dashboard');
+                        tokenAuth({ variables: { username, password } })
                     }} block variant="dark" type="submit">
                         Login
                     </Button>
@@ -52,10 +40,6 @@ const Login = () => {
             </Form>
         </div>
     )
-}
-
-Login.propTypes = {
-    setToken: PropTypes.func.isRequired
 }
 
 export default Login;
